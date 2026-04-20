@@ -1,0 +1,2 @@
+# PlayManagerCM
+Minecraft плагин PlayManagerCM
