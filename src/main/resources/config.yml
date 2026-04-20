@@ -1,13 +1,11 @@
-# PlayManagerCM Configuration v2.2
-# Supported versions: 1.20-1.21.6
+# Версия PlayManagerCM v2.2
+# Версии: 1.20-1.21.6
 
-# Display formats
 player_tab: "%rank%&f%name% %status%"
 player_chat: "%rank%&f%name% %status%"
 player_head: "%rank%&f%name% %status%"
 chat-separator: " &6>> &f"
 
-# Private message settings
 private-messages:
   format-sender: "&7[&fВы&7 -> &f{target}&7]: &f{message}"
   format-receiver: "&7[&f{sender}&7 -> &fВам&7]: &f{message}"
@@ -16,7 +14,6 @@ private-messages:
   sound-volume: 2
   sound-pitch: 2
 
-# AFK Settings
 afk:
   enabled: true
   afk-time-seconds: 90
@@ -26,7 +23,6 @@ afk:
     became-afk: "&eВы были признаны АФК"
     left-afk: "&aВы больше не АФК"
 
-# Crafting Settings
 crafting:
   experience-bottle:
     enabled: true
