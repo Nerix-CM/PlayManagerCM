@@ -1,0 +1,26 @@
+name: PlayManagerCM
+version: 2.2
+main: com.nerix.playmanagercm.PlayManagerCM
+api-version: "1.20"
+authors: [_Nerix]
+commands:
+  compass:
+    description: Main compass command
+    usage: /compass <player|marker|addmarker|delmarker> [arguments]
+    aliases: [compas, cm]
+  ping:
+    description: Check your ping or another player's ping
+    usage: /ping [player]
+  msg:
+    description: Send private message to a player
+    usage: /msg <player> <message>
+    aliases: [m, tell, whisper, w]
+  rank:
+    description: Manage player ranks
+    usage: /rank <set|remove|reload> [player] [rank]
+    permission: playmanager.admin
+  playmanagercm:
+    description: Main plugin management command
+    usage: /playmanagercm <reload>
+    aliases: [pmcm]
+    permission: playmanager.admin

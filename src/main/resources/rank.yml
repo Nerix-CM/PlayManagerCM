@@ -1,0 +1,34 @@
+# PlayManagerCM Ranks Configuration v2.1
+
+ranks:
+  admin:
+    prefix: "&cАдминистратор "
+    rank: 1
+    players:
+      - "_Nerix"
+    parent:
+      - "default"
+    permissions:
+      - "*"
+  moder:
+    prefix: "&9Модератор "
+    rank: 2
+    players:
+      - "DyavoI"
+    parent:
+      - "default"
+    permissions:
+      - ""
+  default:
+    prefix: ""
+    rank: 100
+    parent: []
+    permissions:
+      - "Gsit.Sit"
+      - "Gsit.SitClick"
+      - "Gsit.SitToggle"
+      - "Gsit.PlayerSit"
+      - "Gsit.PlayerSitToggle"
+      - "Gsit.Lay"
+      - "Gsit.BellyFlop"
+      - "Gsit.Spin"

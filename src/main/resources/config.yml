@@ -1,0 +1,85 @@
+# PlayManagerCM Configuration v2.2
+# Supported versions: 1.20-1.21.6
+
+# Display formats
+player_tab: "%rank%&f%name% %status%"
+player_chat: "%rank%&f%name% %status%"
+player_head: "%rank%&f%name% %status%"
+chat-separator: " &6>> &f"
+
+# Private message settings
+private-messages:
+  format-sender: "&7[&fВы&7 -> &f{target}&7]: &f{message}"
+  format-receiver: "&7[&f{sender}&7 -> &fВам&7]: &f{message}"
+  sound-enabled: true
+  sound-type: "BLOCK_NOTE_BLOCK_PLING"
+  sound-volume: 2
+  sound-pitch: 2
+
+# AFK Settings
+afk:
+  enabled: true
+  afk-time-seconds: 90
+  status-text: "&cАФК"
+  check-interval: 5
+  messages:
+    became-afk: "&eВы были признаны АФК"
+    left-afk: "&aВы больше не АФК"
+
+# Crafting Settings
+crafting:
+  experience-bottle:
+    enabled: true
+    result-amount: 3
+    recipe:
+      - ["REDSTONE", "REDSTONE", "REDSTONE"]
+      - ["LAPIS_LAZULI", "LAPIS_LAZULI", "LAPIS_LAZULI"]
+      - ["GLASS_BOTTLE", "GLASS_BOTTLE", "GLASS_BOTTLE"]
+
+compass:
+  name: "&fКомпас к &6{player}"
+  lore:
+    - "&7Компас который показывает"
+    - "&7Путь к игроку или метке"
+  update-interval: 0.2
+
+bossbar:
+  enabled: true
+  message: "&fКоординаты игрока &6{player}&f: &6{x} {y} {z} &7(блоков: &6{distance}&7, мир: {world}&7)"
+  death-message: "&fКоординаты &6смерти &fигрока &6{player}&f: &6{x} {y} {z} &7(блоков: &6{distance}&7, мир: {world}&7)"
+  marker-message: "&fКоординаты метки &6{marker}&f: &6{x} {y} {z} &7(блоков: &6{distance}&7, мир: {world}&7)"
+  update-interval: 0.2
+  color: "GREEN"
+  style: "SOLID"
+
+actionbar:
+  enabled: true
+  message: "&6{x} {y} {z} | Наиграно &6{playtime} | День &6{day}"
+  update-interval: 0.2
+
+death:
+  message: "&fИгрок &6{player} &fумер на координатах: &6{x} {y} {z}"
+  save-location: true
+
+command:
+  success: "&fКомпас направлен к игроку &6{player}"
+  success-death: "&fКомпас направлен на &6смерть &fигрока &6{player}"
+  success-self-death: "&fКомпас направлен на &6вашу смерть"
+  success-marker: "&fКомпас направлен на метку &6{marker}"
+  usage: "&cИспользование: /compass <игрок|addmarker|delmarker|marker> [аргументы]"
+  player-not-found: "&cИгрок не найден или не в сети!"
+  self-target: "&cНельзя выбрать себя!"
+  no-death-location: "&cЭтот игрок еще не умирал."
+  console-error: "&cЭта команда только для игроков!"
+
+shift-click:
+  enabled: true
+  message: "&fКомпас направлен к игроку &6{player}"
+  error-message: "&cНе удалось переключиться на игрока: слишком далеко или не наведён прицел!"
+  max-distance: 5.0
+  cooldown: 3
+
+item:
+  unbreakable: true
+  prevent-drop: true
+  prevent-death-drop: true
