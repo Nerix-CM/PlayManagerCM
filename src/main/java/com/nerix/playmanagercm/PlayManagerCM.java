@@ -49,14 +49,12 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
     private final Map<String, Location> markers = new HashMap<>();
     private final Map<UUID, Long> playerJoinTimes = new HashMap<>();
 
-    // AFK System
     private final Map<UUID, Long> lastMovementTime = new HashMap<>();
     private final Map<UUID, Boolean> isAfk = new HashMap<>();
     private final Map<UUID, Location> lastLocation = new HashMap<>();
     private final Map<UUID, Float> lastYaw = new HashMap<>();
     private final Map<UUID, Float> lastPitch = new HashMap<>();
 
-    // Rank System
     private final Map<String, RankInfo> ranks = new HashMap<>();
     private final Map<UUID, String> playerRanks = new HashMap<>();
     private final Map<UUID, PermissionAttachment> playerPermissions = new HashMap<>();
@@ -81,7 +79,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
     private String headFormat;
     private String chatSeparator;
 
-    // Private messages settings
     private String privateMessageSenderFormat;
     private String privateMessageReceiverFormat;
     private boolean privateMessageSoundEnabled;
@@ -91,32 +88,25 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        // Создаем папку плагина если не существует
         if (!getDataFolder().exists()) {
             getDataFolder().mkdirs();
         }
 
-        // Инициализация Keys
         compassKey = new NamespacedKey(this, "tracking_compass");
         targetKey = new NamespacedKey(this, "target_player");
         deathTrackingKey = new NamespacedKey(this, "death_tracking");
         markerKey = new NamespacedKey(this, "target_marker");
 
-        // Сохраняем конфиг по умолчанию
         saveDefaultConfig();
 
-        // Перезагружаем конфиг
         reloadConfig();
         config = getConfig();
         loadConfigValues();
 
-        // Загрузка маркеров (создает файл если не существует)
         loadMarkers();
 
-        // Загрузка рангов (создает файл если не существует)
         loadRanks();
 
-        // Регистрация крафтов
         registerRecipes();
 
         getServer().getPluginManager().registerEvents(this, this);
@@ -129,11 +119,9 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        // Сохраняем маркеры
         saveMarkers();
         saveRanks();
 
-        // Очищаем пермишионы
         for (PermissionAttachment attachment : playerPermissions.values()) {
             attachment.remove();
         }
@@ -154,7 +142,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
         playerPermissions.clear();
         ranks.clear();
 
-        // Удаляем все BossBars
         for (BossBar bossBar : playerBossBars.values()) {
             bossBar.removeAll();
         }
@@ -171,25 +158,20 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
 
         int resultAmount = config.getInt("crafting.experience-bottle.result-amount", 3);
 
-        // Создаем рецепт для бутылочки опыта
         NamespacedKey key = new NamespacedKey(this, "experience_bottle_craft");
 
-        // Проверяем, не зарегистрирован ли уже рецепт
         if (Bukkit.getRecipe(key) != null) {
             Bukkit.removeRecipe(key);
         }
 
         ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.EXPERIENCE_BOTTLE, resultAmount));
 
-        // Устанавливаем форму крафта
         recipe.shape("RRR", "LLL", "BBB");
 
-        // Устанавливаем ингредиенты
         recipe.setIngredient('R', Material.REDSTONE);
         recipe.setIngredient('L', Material.LAPIS_LAZULI);
         recipe.setIngredient('B', Material.GLASS_BOTTLE);
 
-        // Регистрируем рецепт
         Bukkit.addRecipe(recipe);
 
         getLogger().info("Registered experience bottle crafting recipe! Result amount: " + resultAmount);
@@ -200,20 +182,17 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
         bossbarUpdateInterval = config.getInt("bossbar.update-interval", 1) * 20;
         actionbarUpdateInterval = config.getInt("actionbar.update-interval", 1) * 20;
 
-        // AFK настройки
         afkEnabled = config.getBoolean("afk.enabled", true);
         afkTimeSeconds = config.getInt("afk.afk-time-seconds", 120);
         afkStatusText = ChatColor.translateAlternateColorCodes('&', config.getString("afk.status-text", "&cАФК"));
         afkBecameMessage = ChatColor.translateAlternateColorCodes('&', config.getString("afk.messages.became-afk", "&eВы были признаны АФК"));
         afkLeftMessage = ChatColor.translateAlternateColorCodes('&', config.getString("afk.messages.left-afk", "&aВы больше не АФК"));
 
-        // Форматы отображения
         tabFormat = config.getString("player_tab", "%rank% %name% %status%");
         chatFormat = config.getString("player_chat", "%rank%%name% %status%");
         headFormat = config.getString("player_head", "%rank% %name% %status%");
         chatSeparator = config.getString("chat-separator", "&6>> &f");
 
-        // Настройки личных сообщений
         privateMessageSenderFormat = config.getString("private-messages.format-sender", "&7[&fВы&7 -> &f{target}&7]: &f{message}");
         privateMessageReceiverFormat = config.getString("private-messages.format-receiver", "&7[&f{sender}&7 -> &fВам&7]: &f{message}");
         privateMessageSoundEnabled = config.getBoolean("private-messages.sound-enabled", true);
@@ -225,16 +204,13 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
     private void loadRanks() {
         ranksFile = new File(getDataFolder(), "rank.yml");
 
-        // Если файл не существует, создаем из ресурса
         if (!ranksFile.exists()) {
             try {
-                // Пытаемся скопировать из ресурсов
                 InputStream inputStream = getResource("rank.yml");
                 if (inputStream != null) {
                     Files.copy(inputStream, ranksFile.toPath());
                     getLogger().info("Created rank.yml from resources");
                 } else {
-                    // Если нет в ресурсах, создаем пустой
                     ranksFile.createNewFile();
                     getLogger().info("Created empty rank.yml");
                 }
@@ -246,7 +222,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
 
         ranksConfig = YamlConfiguration.loadConfiguration(ranksFile);
 
-        // Очищаем старые ранги
         ranks.clear();
 
         if (ranksConfig.contains("ranks")) {
@@ -263,12 +238,10 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
             }
         }
 
-        // Убедимся что есть дефолтный ранг
         if (!ranks.containsKey("default")) {
             RankInfo defaultRank = new RankInfo("default", "", 100, new ArrayList<>(), new ArrayList<>());
             ranks.put("default", defaultRank);
 
-            // Сохраняем дефолтный ранг в файл
             ranksConfig.set("ranks.default.prefix", "");
             ranksConfig.set("ranks.default.rank", 100);
             ranksConfig.set("ranks.default.parent", new ArrayList<>());
@@ -287,7 +260,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
     private void saveRanks() {
         if (ranksConfig == null) return;
 
-        // Очищаем старые данные
         ranksConfig.set("ranks", null);
 
         for (Map.Entry<String, RankInfo> entry : ranks.entrySet()) {
@@ -311,7 +283,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
         String rankName = playerRanks.get(uuid);
 
         if (rankName == null) {
-            // Проверяем, есть ли игрок в списках рангов
             rankName = "default";
             for (Map.Entry<String, RankInfo> entry : ranks.entrySet()) {
                 if (entry.getValue().players.contains(player.getName())) {
@@ -322,16 +293,13 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
             playerRanks.put(uuid, rankName);
         }
 
-        // Удаляем старые пермишионы
         if (playerPermissions.containsKey(uuid)) {
             playerPermissions.get(uuid).remove();
         }
 
-        // Создаем новое прикрепление
         PermissionAttachment attachment = player.addAttachment(this);
         playerPermissions.put(uuid, attachment);
 
-        // Добавляем пермишионы из ранга и его родителей
         Set<String> allPermissions = new HashSet<>();
         addPermissionsRecursive(rankName, allPermissions);
 
@@ -343,7 +311,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
             }
         }
 
-        // Обновляем отображение
         updatePlayerDisplay(player);
     }
 
@@ -373,7 +340,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
         return "";
     }
 
-    // Основной метод для получения отображаемого имени с цветами
     private String getColoredDisplay(Player player, String format) {
         String rankPrefix = getPlayerRankPrefix(player);
         String name = player.getName();
@@ -392,15 +358,12 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
     }
 
     private void updatePlayerDisplay(Player player) {
-        // Обновляем отображение в табе - с цветами
         String tabDisplay = getColoredDisplay(player, tabFormat);
         player.setPlayerListName(tabDisplay);
 
-        // Обновляем отображение над головой - с цветами
         String headDisplay = getColoredDisplay(player, headFormat);
         player.setDisplayName(headDisplay);
 
-        // Устанавливаем пользовательское имя
         player.setCustomName(headDisplay);
         player.setCustomNameVisible(true);
     }
@@ -480,7 +443,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
     private void loadMarkers() {
         markersFile = new File(getDataFolder(), "markers.yml");
 
-        // Создаем файл если не существует
         if (!markersFile.exists()) {
             try {
                 markersFile.createNewFile();
@@ -493,7 +455,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
 
         markersConfig = YamlConfiguration.loadConfiguration(markersFile);
 
-        // Очищаем старые маркеры
         markers.clear();
 
         if (markersConfig.contains("markers")) {
@@ -739,7 +700,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
         try {
             player.sendActionBar(message);
         } catch (NoSuchMethodError e) {
-            // Fallback для старых версий
         }
     }
 
@@ -867,10 +827,8 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         updatePlayerActivity(player);
 
-        // Получаем форматированный префикс
         String prefix = getColoredDisplay(player, chatFormat);
 
-        // Формируем итоговый формат сообщения
         String separator = ChatColor.translateAlternateColorCodes('&', chatSeparator);
         event.setFormat(prefix + separator + "%2$s");
     }
@@ -1112,24 +1070,19 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
         if (subCommand.equals("reload")) {
             long startTime = System.currentTimeMillis();
 
-            // Перезагружаем конфиг
             reloadConfig();
             config = getConfig();
             loadConfigValues();
 
-            // Перезагружаем ранги
             loadRanks();
 
-            // Перезагружаем маркеры
             loadMarkers();
 
-            // Обновляем отображение у всех игроков
             for (Player player : Bukkit.getOnlinePlayers()) {
                 setupPlayerRank(player);
                 updatePlayerDisplay(player);
             }
 
-            // Перерегистрируем рецепты
             registerRecipes();
 
             long reloadTime = System.currentTimeMillis() - startTime;
@@ -1378,7 +1331,6 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
 
         String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
-        // Форматируем сообщения с использованием настроек из конфига
         String senderFormatted = privateMessageSenderFormat
                 .replace("{target}", target.getName())
                 .replace("{message}", message);
@@ -1387,24 +1339,19 @@ public class PlayManagerCM extends JavaPlugin implements Listener {
                 .replace("{sender}", player.getName())
                 .replace("{message}", message);
 
-        // Отправка сообщений
         target.sendMessage(ChatColor.translateAlternateColorCodes('&', receiverFormatted));
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', senderFormatted));
 
-        // Звуковой эффект
         if (privateMessageSoundEnabled) {
             try {
                 Sound sound = Sound.valueOf(privateMessageSoundType);
                 target.playSound(target.getLocation(), sound, privateMessageSoundVolume, privateMessageSoundPitch);
             } catch (IllegalArgumentException e) {
-                // Если звук не найден, используем стандартный
                 try {
                     target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 } catch (Exception ex) {
-                    // Игнорируем
                 }
             } catch (Exception e) {
-                // Игнорируем ошибки звука
             }
         }
 
